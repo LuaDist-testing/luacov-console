@@ -4,6 +4,9 @@ local luacov = require("luacov.runner")
 local configuration = luacov.load_config()
 local reporter = require("luacov.reporter.console")
 local argparse = require("argparse")
+local lfs = require('lfs')
+
+local VERSION = "1.1.0"
 
 -- Use ANSI escape sequences.
 -- https://en.wikipedia.org/wiki/ANSI_escape_code
@@ -30,7 +33,21 @@ local function print_error(...)
 end
 
 local function index()
-    local idx_file = configuration.reportfile .. '.index'
+    local report_file = configuration.reportfile
+    local idx_file = report_file .. '.index'
+    local idx_file_ctime, err = lfs.attributes(idx_file, "change")
+    if not idx_file_ctime then
+        print_error("Can't stat ctime of ", idx_file, ": ", err)
+    end
+    local report_file_ctime, err = lfs.attributes(report_file, "change")
+    if not report_file_ctime then
+        print_error("Can't stat ctime of ", report_file_ctime, ": ", err)
+    end
+    if report_file_ctime > idx_file_ctime then
+        print_error(report_file, " was changed after ", idx_file, " created."..
+            " Please rerun luacov-console <dir> to recreate the index.")
+    end
+
     local idx = {
         filenames = {}
     }
@@ -149,6 +166,7 @@ end
 local parser = argparse("luacov-console",
                         "Combine luacov with your development cycle and CI")
 parser:argument("workdir", "Specific the source directory", '.')
+parser:option("--version", "Print version"):args(0)
 parser:option("--no-colored", "Don't print with color."):args(0)
 parser:option("-l --list", "List coverage results of files matched given lua pattern(s)."):args('+')
 parser:option("-s --summary", "Show coverage summary."):args(0)
@@ -159,6 +177,8 @@ if args.list then
     print_results(args.list, args.no_colored)
 elseif args.summary then
     print_summary(args.no_colored)
+elseif args.version then
+    print(VERSION)
 else
     reporter.report(args)
 end
