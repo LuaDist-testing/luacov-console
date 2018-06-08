@@ -1,9 +1,17 @@
+-- This file was automatically generated for the LuaDist project.
+
 package = "luacov-console"
-version = "1.0-2"
+version = "1.0-3"
+-- LuaDist source
 source = {
-    url = "git://github.com/spacewander/luacov-console",
-    tag = "1.0.2",
+  tag = "1.0-3",
+  url = "git://github.com/LuaDist-testing/luacov-console.git"
 }
+-- Original source
+-- source = {
+--     url = "git://github.com/spacewander/luacov-console",
+--     tag = "1.0.2",
+-- }
 description = {
     summary = "Combine luacov with your development cycle and CI",
     detailed = "Combine luacov with your development cycle and CI",
